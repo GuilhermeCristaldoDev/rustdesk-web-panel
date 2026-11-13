@@ -1,15 +1,16 @@
 from typing import Annotated
-
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Query
 from datetime import datetime, timezone
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 class ClientBase(SQLModel):
-    id: str = Field(primary_key=True)
-    name: str = Field(default="Novo Cliente", index=True)
+    id: str = Field(primary_key=True, min_length=9, max_length=9, regex=r"^[0-9]+$")
+    name: str = Field(default="Novo Cliente",max_length=50, index=True)
+    device: str | None = Field(default=None, max_length=50)
 
 class Client(ClientBase, table=True):
-    passwd: str | None = Field(default=None)
+    passwd: str | None = Field(default=None, max_length=6)
     created_at: datetime | None = Field(default_factory=lambda: datetime.now(timezone.utc), index=True)
     last_session: datetime | None = Field(default=None, index=True)
 
@@ -18,13 +19,13 @@ class ClientPublic(ClientBase):
     last_session: datetime | None = None 
 
 class ClientCreate(ClientBase):
-    passwd: str | None = None 
+    passwd: str | None = Field(default=None, max_length=6)
 
-class ClientUpdate(ClientBase):
-    id: str | None = None
-    name: str | None = None
-    passwd: str | None = None
-
+class ClientUpdate(SQLModel):
+    name: str | None = Field(default=None, max_length=50) 
+    device: str | None = Field(default=None, max_length=50)
+    passwd: str | None = Field(default=None, max_length=6)
+   
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
@@ -40,25 +41,30 @@ def get_session():
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
-app = FastAPI()
-
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     create_db_and_tables()
+    yield
+
+app = FastAPI(lifespan=lifespan)    
 
 @app.get("/clients/", response_model=list[ClientPublic])
-def read_clients(session: SessionDep):
-    clients = session.exec(select(Client)).all()
+def read_clients(
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=20)] = 20
+    ):
+    clients = session.exec(select(Client).offset(offset).limit(limit)).all()
     return clients
 
-@app.get("/client/{client_id}", response_model=ClientPublic)
+@app.get("/clients/{client_id}", response_model=ClientPublic)
 def read_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
     return client
 
-@app.post("/client/", response_model=ClientPublic)
+@app.post("/clients/", response_model=ClientPublic)
 def create_client(client: ClientCreate, session: SessionDep):
     client_exists = session.get(Client, client.id)
     if client_exists:
@@ -69,7 +75,7 @@ def create_client(client: ClientCreate, session: SessionDep):
     session.refresh(db_client)
     return db_client
 
-@app.delete("/client/{client_id}")
+@app.delete("/clients/{client_id}")
 def delete_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
     if not client:
@@ -78,7 +84,7 @@ def delete_client(client_id: str, session: SessionDep):
     session.commit()
     return {"ok": True}
 
-@app.patch("/client/{client_id}", response_model=ClientPublic)
+@app.patch("/clients/{client_id}", response_model=ClientPublic)
 def update_client(client_id: str, client: ClientUpdate,session: SessionDep):
     client_db = session.get(Client, client_id)
     if not client_db:
