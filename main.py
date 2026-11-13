@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Query
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 class ClientBase(SQLModel):
@@ -10,8 +10,8 @@ class ClientBase(SQLModel):
 
 class Client(ClientBase, table=True):
     passwd: str | None = Field(default=None)
-    created_at: datetime | None = Field(default_factory=datetime.now, index=True)
-    last_session: datetime | None = Field(index=True)
+    created_at: datetime | None = Field(default_factory=lambda: datetime.now(timezone.utc), index=True)
+    last_session: datetime | None = Field(default=None, index=True)
 
 class ClientPublic(ClientBase):
     created_at: datetime | None = None
@@ -60,6 +60,9 @@ def read_client(client_id: str, session: SessionDep):
 
 @app.post("/client/", response_model=ClientPublic)
 def create_client(client: ClientCreate, session: SessionDep):
+    client_exists = session.get(Client, client.id)
+    if client_exists:
+        raise HTTPException(status_code=409, detail="Esse cliente já existe")
     db_client = Client.model_validate(client)
     session.add(db_client)
     session.commit()
