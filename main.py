@@ -4,12 +4,26 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from datetime import datetime
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-class Client(SQLModel, table=True):
+class ClientBase(SQLModel):
     id: str = Field(primary_key=True)
     name: str = Field(default="Novo Cliente", index=True)
+
+class Client(ClientBase, table=True):
     passwd: str | None = Field(default=None)
     crated_at: datetime | None = Field(default_factory=datetime.now, index=True)
     last_session: datetime | None = Field(index=True)
+
+class ClientPublic(ClientBase):
+    created_at: datetime | None = None
+    last_session: datetime | None = None 
+
+class ClientCreate(ClientBase):
+    passwd: str | None = None 
+
+class ClientUpdate(ClientBase):
+    id: str | None = None
+    name: str | None = None
+    passwd: str | None = None
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -32,24 +46,25 @@ app = FastAPI()
 def on_startup():
     create_db_and_tables()
 
-@app.get("/clients/")
-def read_clients(session: SessionDep) -> list[Client]:
+@app.get("/clients/", response_model=list[ClientPublic])
+def read_clients(session: SessionDep):
     clients = session.exec(select(Client)).all()
     return clients
 
-@app.get("/clients/{client_id}")
-def read_client(client_id: str, session: SessionDep) -> Client:
+@app.get("/clients/{client_id}", response_model=ClientPublic)
+def read_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
     return client
 
-@app.post("/client/")
-def create_client(client: Client, session: SessionDep) -> Client:
+@app.post("/client/", response_model=ClientPublic)
+def create_client(client: ClientCreate, session: SessionDep):
+    db_client = Client.model_validate(client)
     session.add(client)
     session.commit()
     session.refresh(client)
-    return client
+    return db_client
 
 @app.delete("client")
 def delete_client(client_id: str, session: SessionDep):
@@ -59,4 +74,17 @@ def delete_client(client_id: str, session: SessionDep):
     session.delete(client)
     session.commit()
     return {"ok": True}
+
+@app.pattch("/client/{client_id}", response_model=ClientPublic)
+def update_client(client_id: str, client: ClientUpdate, SessionDep):
+    client_db = session.get(Client, client_id)
+    if not client_db:
+        raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    client_data = client.model_dump(exclude_unset=True)
+    client_db.sqlmodel_update(client_data)
+    session.add(client_db)
+    session.commit()
+    session.refresh(client_db)
+    return hero_db    
+
 
