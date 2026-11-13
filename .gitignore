@@ -9,6 +9,7 @@ venv/
 ENV/
 env.bak
 venv.bak
+seed.py
 
 # Banco de Dados Local (SQLite)
 *.db

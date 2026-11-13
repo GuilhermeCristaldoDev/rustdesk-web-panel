@@ -1,6 +1,7 @@
 from typing import Annotated
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 from datetime import datetime, timezone
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
@@ -96,4 +97,4 @@ def update_client(client_id: str, client: ClientUpdate,session: SessionDep):
     session.refresh(client_db)
     return client_db    
 
-
+app.frontend(directory="static", fallback="index.html")
