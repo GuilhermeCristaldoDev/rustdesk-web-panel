@@ -10,7 +10,7 @@ class ClientBase(SQLModel):
 
 class Client(ClientBase, table=True):
     passwd: str | None = Field(default=None)
-    crated_at: datetime | None = Field(default_factory=datetime.now, index=True)
+    created_at: datetime | None = Field(default_factory=datetime.now, index=True)
     last_session: datetime | None = Field(index=True)
 
 class ClientPublic(ClientBase):
@@ -61,22 +61,22 @@ def read_client(client_id: str, session: SessionDep):
 @app.post("/client/", response_model=ClientPublic)
 def create_client(client: ClientCreate, session: SessionDep):
     db_client = Client.model_validate(client)
-    session.add(client)
+    session.add(db_client)
     session.commit()
-    session.refresh(client)
+    session.refresh(db_client)
     return db_client
 
-@app.delete("client")
+@app.delete("/client/{client_id}")
 def delete_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
-    if not hero:
+    if not client:
         raise HTTPException(status_code=404, detail="Cliente não foi encontrado")
     session.delete(client)
     session.commit()
     return {"ok": True}
 
-@app.pattch("/client/{client_id}", response_model=ClientPublic)
-def update_client(client_id: str, client: ClientUpdate, SessionDep):
+@app.patch("/client/{client_id}", response_model=ClientPublic)
+def update_client(client_id: str, client: ClientUpdate,session: SessionDep):
     client_db = session.get(Client, client_id)
     if not client_db:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
