@@ -51,7 +51,7 @@ def read_clients(session: SessionDep):
     clients = session.exec(select(Client)).all()
     return clients
 
-@app.get("/clients/{client_id}", response_model=ClientPublic)
+@app.get("/client/{client_id}", response_model=ClientPublic)
 def read_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
     if not client:
@@ -88,6 +88,6 @@ def update_client(client_id: str, client: ClientUpdate,session: SessionDep):
     session.add(client_db)
     session.commit()
     session.refresh(client_db)
-    return hero_db    
+    return client_db    
 
 
