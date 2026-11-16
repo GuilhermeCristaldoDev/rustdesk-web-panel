@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from .database import create_db_and_tables
-from .routers import clients
+from .routers import clients, auth
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(clients.router)    
+app.include_router(auth.router)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
