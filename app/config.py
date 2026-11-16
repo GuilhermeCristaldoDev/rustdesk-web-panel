@@ -1,5 +1,5 @@
 import os 
 
-JWT_SECRET = os.environ["JWT_SECRET"]
+JWT_SECRET = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
 TOKEN_HOURS = 8

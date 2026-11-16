@@ -1,7 +1,8 @@
 import jwt
 from pwdlib import PasswordHash
 from datetime import datetime, timezone, timedelta
-from config import JWT_SECRET, TOKEN_HOURS, ALGORITHM
+
+from .config import JWT_SECRET, TOKEN_HOURS, ALGORITHM
 
 _ph = PasswordHash.recommended()
 

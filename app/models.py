@@ -2,13 +2,13 @@ from sqlmodel import SQLModel, Field
 from datetime import datetime, timezone
 
 
-//atributos comuns entre os pymodels
+#atributos comuns entre os pymodels
 class ClientBase(SQLModel):
     id: str = Field(primary_key=True, min_length=9, max_length=9, regex=r"^[0-9]+$")
     name: str = Field(default="Novo Cliente",max_length=50, index=True)
     device: str | None = Field(default=None, max_length=50)
 
-//tabela clientes
+#tabela clientes
 class Client(ClientBase, table=True):
     passwd: str | None = Field(default=None, max_length=6)
     created_at: datetime | None = Field(default_factory=lambda: datetime.now(timezone.utc), index=True)
@@ -26,8 +26,8 @@ class ClientUpdate(SQLModel):
     device: str | None = Field(default=None, max_length=50)
     passwd: str | None = Field(default=None, max_length=6)
 
-//tabela de usuarios
+#tabela de usuarios
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True, max_length=50)
-    password_hash: int 
+    password_hash: str
