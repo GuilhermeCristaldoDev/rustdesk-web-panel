@@ -25,3 +25,9 @@ class ClientUpdate(SQLModel):
     name: str | None = Field(default=None, max_length=50) 
     device: str | None = Field(default=None, max_length=50)
     passwd: str | None = Field(default=None, max_length=6)
+
+//tabela de usuarios
+class User(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    username: str = Field(unique=True, index=True, max_length=50)
+    password_hash: int 
