@@ -2,6 +2,7 @@ from typing import Annotated
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from datetime import datetime, timezone
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
@@ -48,6 +49,12 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)    
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+def ler_pagina():
+    return FileResponse("static/index.html")
 
 @app.get("/clients/", response_model=list[ClientPublic])
 def read_clients(
@@ -97,4 +104,4 @@ def update_client(client_id: str, client: ClientUpdate,session: SessionDep):
     session.refresh(client_db)
     return client_db    
 
-app.frontend(directory="static", fallback="index.html")
+

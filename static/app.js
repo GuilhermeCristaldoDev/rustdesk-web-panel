@@ -3,7 +3,6 @@ const table = document.getElementById('clientsTableBody')
 
 async function getClients(){
     const response = await fetch("/clients/")
-    console.log(response)
     const clients = await response.json()
 
     table.innerHTML = ""
@@ -13,8 +12,8 @@ async function getClients(){
                 <tr>
                     <td><strong>${client.name}</strong></td>
                     <td><span class="badge-id">${client.id}</span></td>
-                    <td>${client.device} ||</td>
-                    <td><code>${client.passwd} ||</code></td>
+                    <td>${client.device || "-"}</td>
+                    <td><code>${client.passwd || "-"}</code></td>
                     <td>${client.created_at}</td>
                     <td class="actions">
                         <button class="btn-icon" title="Editar">✏️</button>
