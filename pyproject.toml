@@ -1,3 +1,5 @@
+[tool.fastapi]
+entrypoint = "app.main:app"
 [project]
 name = "rustdesk-web-panel"
 version = "0.1.0"
