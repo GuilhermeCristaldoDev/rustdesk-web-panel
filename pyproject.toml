@@ -6,5 +6,7 @@ version = "0.1.0"
 requires-python = ">=3.15"
 dependencies = [
     "fastapi[standard]>=0.162.5",
+    "pwdlib[argon2]>=0.4.2",
+    "pyjwt>=2.15.1",
     "sqlmodel>=0.0.49",
 ]
