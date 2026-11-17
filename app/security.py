@@ -6,6 +6,7 @@ from .config import JWT_SECRET, TOKEN_HOURS, ALGORITHM
 
 _ph = PasswordHash.recommended()
 
+
 def hash_password(password: str) -> str:
     return _ph.hash(password)
 
@@ -21,3 +22,4 @@ def decode_token(token: str) -> str:
     return payload["sub"]
 
 
+DUMMY_HASH = hash_password("qualquer-coisa")
