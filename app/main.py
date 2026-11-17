@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from .database import create_db_and_tables
 from .routers import clients, auth
+from .dependencies import current_user
 
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -16,8 +17,9 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(clients.router)    
 app.include_router(auth.router)
+app.include_router(clients.router, dependencies=[Depends(current_user)])    
+
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi import APIRouter, Response, HTTPException
-from sqlmodel import select
+from sqlmodel import select, Field
 
 from ..models import User
 from ..database import SessionDep 
