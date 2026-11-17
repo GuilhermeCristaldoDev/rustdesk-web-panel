@@ -29,7 +29,7 @@ def login(data: LoginData, response: Response, session: SessionDep):
         httponly=True, 
         secure=True, 
         samesite="strict", 
-        max_age=COOKIE_EXPIRE_TIME
+        max_age=int(COOKIE_EXPIRE_TIME)
     )
     return {"ok": True}
 
