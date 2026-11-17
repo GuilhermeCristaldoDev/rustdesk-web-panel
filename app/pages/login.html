@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <title>Pantaneira Digital | Login</title>
+</head>
+<body>
+  <main>
+    <h1>Acesso remoto</h1>
+
+    <form id="loginForm">
+      <label>Usuário
+        <input id="username" name="username" autocomplete="username" required maxlength="50">
+      </label>
+
+      <label>Senha
+        <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128">
+      </label>
+      
+      <button type="submit" id="button">Entrar</button>
+      <p id="error" role="alert" hidden></p>
+    </form>
+
+  </main>
+  <script src="../static/js/login.js"></script>
+</body>
+</html>

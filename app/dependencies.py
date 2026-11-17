@@ -14,3 +14,14 @@ def current_user(access_token: str | None = Cookie(default=None)) -> str:
         raise HTTPException(status_code=401, detail="Sessão inválida")
     else:
         return username
+
+def optional_user(access_token: str | None = Cookie(default=None)) -> str | None:
+    if not access_token:
+        return None
+
+    try:
+        username = decode_token(access_token)
+    except jwt.PyJWTError:
+        return None
+    else:
+        return username
