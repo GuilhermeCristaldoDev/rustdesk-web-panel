@@ -27,7 +27,7 @@ def read_client(client_id: str, session: SessionDep):
 def create_client(client: ClientCreate, session: SessionDep):
     client_exists = session.get(Client, client.id)
     if client_exists:
-        raise HTTPException(status_code=409, detail="Esse cliente já existe")
+        raise HTTPException(status_code=409, detail="Este ID de conexão remota já está cadastrado")
     db_client = Client.model_validate(client)
     session.add(db_client)
     session.commit()

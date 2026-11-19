@@ -171,7 +171,7 @@ dialog h2 { margin: 0 0 20px; font-size: 1.3rem; font-weight: 700; color: var(--
 dialog .texto { margin: 0 0 8px; line-height: 1.5; color: var(--suave); }
 .campo { margin-bottom: 16px; }
 .dica { margin: 6px 0 0; font-size: .85rem; color: var(--suave); }
-.erro-form { margin: 0 0 12px; font-size: .9rem; color: var(--perigo); }
+.erro-form { margin: 0 0 12px; font-size: .9rem; color: var(--perigo); text-align: center;}
 .botoes { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 
 /* ---------- Aviso rápido (o JS troca a classe "visivel") ---------- */

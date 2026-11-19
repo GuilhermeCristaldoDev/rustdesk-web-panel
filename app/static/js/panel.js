@@ -5,11 +5,16 @@ const dlgClient = document.getElementById('dlg-cliente')
 const form = document.getElementById('form-cliente')
 const newClientButton = document.getElementById('novo')
 const cancelButton = document.getElementById('cancelar')
+const erroForm = document.getElementById('erro-form')
+const inputId = document.getElementById('f-id')
+const buttonSave = document.getElementById('salvar')
 
 
 async function getClients(){
     const response = await fetch("/clients/")
     const clients = await response.json()
+
+    table.textContent = ""
 
     if (clients.length == 0) {
         noClientsText.hidden = false
@@ -17,21 +22,23 @@ async function getClients(){
     }
 
     noClientsText.hidden = true
-    table.textContent = ""
-
-    const clone = modelo.content.cloneNode(true)
-
+    
     clients.forEach(client => {
+        const clone = modelo.content.cloneNode(true)
+
+        clone.querySelector('tr').dataset.id = client.id
+
         clone.querySelector('.chip-id').textContent = client.id
         clone.querySelector('.col-nome').textContent = client.name
         clone.querySelector('.col-device').textContent = client.device || "-"
         clone.querySelector('.col-criado').textContent = new Date(client.created_at).toLocaleDateString("pt-BR")
-        clone.querySelector('.col-acesso').textContent = client.last_session || "-"
-
+        clone.querySelector('.col-acesso').textContent = client.last_session? new Date(client.last_session).toLocaleDateString("pt-BR") : "-"
         table.appendChild(clone)
     });
     
 }
+
+
 
 newClientButton.addEventListener("click", () => {
     dlgClient.showModal()
@@ -43,10 +50,12 @@ cancelButton.addEventListener("click", event => {
 
 dlgClient.addEventListener("close", () => {
     form.reset()
+    erroForm.hidden = true
 })
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault()
+    buttonSave.disabled = true
 
     const dados = Object.fromEntries(new FormData(form))
 
@@ -58,14 +67,26 @@ form.addEventListener("submit", async (event) => {
         body: JSON.stringify(dados)
     })
 
-    if (response == 422) {
-        const erro = await response.json()
+    if (response.status === 422) {
+        const erro = await response.json().detail
         console.error(erro)
+    }
+
+    if (response.status === 409) {
+        const data = await response.json()
+
+        erroForm.textContent = data.detail
+        erroForm.hidden = false
+        inputId.focus()
     }
 
     if(response.ok)
         dlgClient.close()
         getClients()
+
+    buttonSave.disabled = false
+
+        
 })
 
 getClients()
