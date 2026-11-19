@@ -10,7 +10,7 @@ buttonShowPassword.addEventListener("click", async () => {
         buttonShowPassword.textContent = "Esconder"
      } else {
         inputPassword.setAttribute("type", "password")
-        buttonShowPassword.textContent = "Mostrar"
+        buttonShowPassword.textContent = "Ocultar"
      }
 })
 

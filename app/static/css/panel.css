@@ -1,0 +1,215 @@
+/* ============================================================
+   Painel de clientes · Pantaneira Digital
+   Só CSS: nenhuma regra depende de JavaScript.
+   O JS só precisa trocar texto, adicionar/remover linhas e
+   abrir/fechar os <dialog> (showModal / close).
+   ============================================================ */
+
+:root {
+  --branco: #fefefe;
+  --fundo: #eef3fa;
+  --marinho: #02153b;
+  --marinho-2: #021c4b;
+  --azul: #0b5fe0;
+  --azul-escuro: #0948b3;
+  --azul-claro: #e8f0ff;
+  --texto: #0f2347;
+  --suave: #5b6b8c;
+  --linha: #e1e8f3;
+  --linha-forte: #cbd6e8;
+  --perigo: #c93232;
+  --perigo-claro: #fdeaea;
+  --fonte: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--fonte);
+  font-size: 16px;
+  color: var(--texto);
+  background: var(--fundo);
+  -webkit-font-smoothing: antialiased;
+}
+button, input { font: inherit; }
+button { cursor: pointer; }
+
+.i { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Topo ---------- */
+.topo { background: var(--marinho); color: #fff; }
+.topo-in {
+  max-width: 1080px; margin: 0 auto; padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.marca { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.logo { flex: none; width: 96px; height: 50px; padding: 4px; background: var(--branco); border-radius: 10px; }
+.logo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 8%; }
+.marca-nome { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
+.marca-sub { margin: 2px 0 0; font-size: .85rem; line-height: 1.2; color: #a9b8d3; }
+
+.btn-sair {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 38px; padding: 0 14px;
+  font-size: .9rem; font-weight: 600; color: #fff;
+  background: transparent; border: 1px solid rgba(255, 255, 255, .35); border-radius: 8px;
+}
+.btn-sair:hover { background: rgba(255, 255, 255, .1); }
+.btn-sair:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* ---------- Conteúdo ---------- */
+.conteudo { max-width: 1080px; margin: 0 auto; padding: 32px 20px 56px; }
+.cabecalho { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+h1 { margin: 0; font-size: 1.75rem; line-height: 1.15; font-weight: 700; letter-spacing: -.015em; color: var(--marinho); }
+.contagem { margin: 4px 0 0; font-size: .95rem; color: var(--suave); }
+
+/* Botões */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 42px; padding: 0 18px;
+  font-size: .95rem; font-weight: 600;
+  border: 1px solid transparent; border-radius: 8px;
+}
+.btn:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.btn:disabled { opacity: .6; cursor: default; }
+.btn-azul { color: #fff; background: var(--azul); }
+.btn-azul:hover:not(:disabled) { background: var(--azul-escuro); }
+.btn-fantasma { color: var(--texto); background: #fff; border-color: var(--linha-forte); }
+.btn-fantasma:hover:not(:disabled) { background: var(--fundo); }
+.btn-perigo { color: #fff; background: var(--perigo); }
+.btn-perigo:hover:not(:disabled) { background: #a92727; }
+
+/* Campos */
+label { display: block; margin-bottom: 6px; font-size: .9rem; font-weight: 600; color: var(--marinho-2); }
+input {
+  display: block; width: 100%; height: 44px; padding: 0 14px;
+  color: var(--texto); background: #fff;
+  border: 1px solid var(--linha-forte); border-radius: 8px;
+}
+input::placeholder { color: #7d8cab; }
+input:hover { border-color: #a9b8d3; }
+input:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 3px rgba(11, 95, 224, .18); }
+input[readonly] { color: var(--suave); background: #f1f5fb; }
+
+.busca {
+  max-width: 420px; margin-bottom: 14px; padding-left: 42px;
+  background: #fff no-repeat 14px center / 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6b8c' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E");
+}
+
+/* ---------- Tabela ---------- */
+.tabela { background: #fff; border: 1px solid var(--linha); border-radius: 12px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 12px 14px; text-align: left; white-space: nowrap;
+  font-size: .82rem; font-weight: 600; color: var(--suave);
+  background: #f7f9fd; border-bottom: 1px solid var(--linha);
+}
+td { padding: 14px; font-size: .95rem; vertical-align: middle; border-bottom: 1px solid var(--linha); }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: #f8fbff; }
+th:first-child, td:first-child { padding-left: 20px; }
+th:last-child, td:last-child { padding-right: 20px; }
+
+.col-id { white-space: nowrap; }
+.col-nome { font-weight: 600; color: var(--marinho); overflow-wrap: anywhere; }
+.col-device { color: var(--suave); overflow-wrap: anywhere; }
+.col-data { white-space: nowrap; color: var(--suave); font-variant-numeric: tabular-nums; }
+.col-acoes { text-align: right; }
+.chip-id {
+  display: inline-block; padding: 4px 10px;
+  font-size: .9rem; font-weight: 500; letter-spacing: .02em; font-variant-numeric: tabular-nums;
+  color: var(--marinho-2); background: var(--azul-claro); border-radius: 6px;
+}
+
+.acoes { display: inline-flex; align-items: center; gap: 4px; }
+.btn-conectar {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 36px; padding: 0 14px; margin-right: 6px;
+  font-size: .9rem; font-weight: 600; color: #fff;
+  background: var(--azul); border: 0; border-radius: 8px;
+}
+.btn-conectar:hover:not(:disabled) { background: var(--azul-escuro); }
+.btn-conectar:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.btn-conectar:disabled { opacity: .7; cursor: default; }
+.btn-icone {
+  display: grid; place-items: center; width: 36px; height: 36px;
+  color: var(--suave); background: transparent; border: 0; border-radius: 8px;
+}
+.btn-icone:hover { color: var(--texto); background: var(--fundo); }
+.btn-icone.excluir:hover { color: var(--perigo); background: var(--perigo-claro); }
+.btn-icone:focus-visible { outline: 2px solid var(--azul); outline-offset: 1px; }
+
+.estado { padding: 48px 20px; text-align: center; color: var(--suave); }
+.estado p { margin: 0 0 14px; }
+.estado p:last-child { margin-bottom: 0; }
+
+/* ---------- Janelas (<dialog>) ---------- */
+/* Não mexa em display/height do dialog: o navegador já centraliza e ajusta ao conteúdo. */
+dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 28px;
+  overflow-y: auto;
+  color: var(--texto);
+  background: #fff;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(2, 21, 59, .25);
+}
+dialog::backdrop { background: rgba(2, 21, 59, .55); }
+dialog h2 { margin: 0 0 20px; font-size: 1.3rem; font-weight: 700; color: var(--marinho); }
+dialog .texto { margin: 0 0 8px; line-height: 1.5; color: var(--suave); }
+.campo { margin-bottom: 16px; }
+.dica { margin: 6px 0 0; font-size: .85rem; color: var(--suave); }
+.erro-form { margin: 0 0 12px; font-size: .9rem; color: var(--perigo); }
+.botoes { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+
+/* ---------- Aviso rápido (o JS troca a classe "visivel") ---------- */
+.aviso {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  max-width: calc(100vw - 32px); padding: 12px 18px;
+  font-size: .95rem; font-weight: 500; color: #fff; background: var(--marinho);
+  border-radius: 8px; box-shadow: 0 8px 28px rgba(2, 21, 59, .3);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.aviso.visivel { opacity: 1; }
+.aviso.erro { color: #7a1a1a; background: var(--perigo-claro); box-shadow: 0 8px 28px rgba(2, 21, 59, .2), inset 0 0 0 1px #f3b9b9; }
+
+/* ---------- Telas menores ---------- */
+@media (max-width: 1100px) {
+  .col-criado { display: none; }
+}
+
+@media (max-width: 880px) {
+  /* cada cliente vira um bloco; o JS só precisa manter os data-label nos <td> */
+  .tabela thead { display: none; }
+  .tabela table, .tabela tbody { display: block; }
+  .tabela tr { display: flex; flex-direction: column; padding: 16px; border-bottom: 1px solid var(--linha); }
+  .tabela tr:last-child { border-bottom: 0; }
+  .tabela td { display: block; padding: 2px 0; border: 0; text-align: left; }
+  .tabela td:first-child, .tabela td:last-child { padding-left: 0; padding-right: 0; }
+  .tabela td.col-nome { order: -1; margin-bottom: 4px; font-size: 1.05rem; }
+  .tabela td.col-criado { display: block; }
+  .tabela td[data-label]::before { content: attr(data-label) ": "; color: var(--suave); font-weight: 400; }
+  .tabela td.col-acoes { margin-top: 12px; }
+}
+
+@media (max-width: 560px) {
+  .topo-in { padding: 10px 16px; }
+  .marca-sub, .marca-nome { display: none; }
+  .conteudo { padding: 24px 16px 48px; }
+  .cabecalho { align-items: flex-start; flex-direction: column; }
+  .busca { max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) { .aviso { transition: none; } }

@@ -1,70 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda RustDesk</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clientes · Pantaneira Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/panel.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Contatos RustDesk</h1>
-            <div class="toolbar">
-                <input type="text" id="searchInput" placeholder="Buscar por apelido, ID ou dispositivo...">
-                <button id="btnNovoCliente" class="btn-primary">+ Novo Contato</button>
-            </div>
-        </header>
 
-        <!-- Formulário de Cadastro (oculto por padrão) -->
-        <section id="formSection" class="card hidden">
-            <h2>Adicionar / Editar Contato</h2>
-            <form id="clientForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="clientId">ID RustDesk (9 dígitos)</label>
-                        <input type="text" id="clientId" maxlength="9" pattern="[0-9]{9}" placeholder="123456789" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="clientName">Apelido</label>
-                        <input type="text" id="clientName" maxlength="50" placeholder="Ex: João - Financeiro">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientDevice">Dispositivo</label>
-                        <input type="text" id="clientDevice" maxlength="50" placeholder="Ex: Notebook Dell">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientPasswd">Senha (até 6 caracteres)</label>
-                        <input type="text" id="clientPasswd" maxlength="6" placeholder="Ex: 123456">
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" id="btnCancelar" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary">Salvar</button>
-                </div>
-            </form>
-        </section>
+  <!--
+    GANCHOS PARA O JS (ids)
+    #sair  #novo  #busca  #contagem  #linhas (tbody)  #estado
+    #modelo-linha (<template> com a linha de cliente, no fim do body)
+    #dlg-cliente  #form-cliente  #dlg-titulo  #f-id  #f-nome  #f-device  #f-senha
+    #dica-senha  #erro-form  #cancelar  #salvar
+    #dlg-excluir  #exc-texto  #exc-erro  #exc-cancelar  #exc-confirmar
+    #aviso (adicione a classe "visivel"; "erro" para mensagem de erro)
+  -->
 
-        <!-- Lista Telefônica -->
-        <main class="card">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Apelido</th>
-                        <th>ID RustDesk</th>
-                        <th>Dispositivo</th>
-                        <th>Senha</th>
-                        <th>Criado em</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="clientsTableBody">
-                    
-                </tbody>
-            </table>
-        </main>
+  <header class="topo">
+    <div class="topo-in">
+      <div class="marca">
+        <div class="logo"><img src="../static/src/vetor.svg" alt="Pantaneira Digital"></div>
+        <div>
+          <p class="marca-nome">Pantaneira Digital</p>
+          <p class="marca-sub">Acesso remoto</p>
+        </div>
+      </div>
+      <button type="button" class="btn-sair" id="sair">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h4"/><path d="M16 8l4 4-4 4M20 12H9"/></svg>
+        Sair
+      </button>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <div class="cabecalho">
+      <div>
+        <h1>Clientes</h1>
+        <p class="contagem" id="contagem" aria-live="polite">3 clientes</p>
+      </div>
+      <button type="button" class="btn btn-azul" id="novo">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Novo cliente
+      </button>
     </div>
 
-    <script src="../static/js/panel.js"></script>
+    <label class="sr-only" for="busca">Buscar cliente</label>
+    <input class="busca" id="busca" type="search" placeholder="Buscar apelido, ID ou dispositivo" autocomplete="off">
+
+    <div class="tabela">
+      <table>
+        <caption class="sr-only">Clientes cadastrados</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID RustDesk</th>
+            <th scope="col">Apelido</th>
+            <th scope="col">Dispositivo</th>
+            <th scope="col" class="col-criado">Criado em</th>
+            <th scope="col">Último acesso</th>
+            <th scope="col" class="col-acoes"><span class="sr-only">Ações</span></th>
+          </tr>
+        </thead>
+
+        <tbody id="linhas">
+        </tbody>
+      </table>
+
+      <!-- Carregando / vazio / erro: o JS preenche o texto e tira o "hidden" -->
+      <div class="estado" id="estado" role="status" hidden>
+        <p>Nenhum cliente cadastrado.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ Cadastrar / editar ============ -->
+  <dialog id="dlg-cliente" aria-labelledby="dlg-titulo">
+    <form id="form-cliente" autocomplete="off">
+      <h2 id="dlg-titulo">Novo cliente</h2>
+
+      <div class="campo">
+        <label for="f-id">ID RustDesk (9 dígitos)</label>
+        <input id="f-id" name="id" inputmode="numeric" pattern="[0-9]{9}" maxlength="9" placeholder="123456789" required>
+      </div>
+      <div class="campo">
+        <label for="f-nome">Apelido</label>
+        <input id="f-nome" name="name" maxlength="80" placeholder="Ex: João - Financeiro" required>
+      </div>
+      <div class="campo">
+        <label for="f-device">Dispositivo</label>
+        <input id="f-device" name="device" maxlength="80" placeholder="Ex: Notebook Dell">
+      </div>
+      <div class="campo">
+        <label for="f-senha">Senha (até 6 caracteres)</label>
+        <input id="f-senha" name="passwd" type="password" maxlength="6" autocomplete="new-password" required>
+        <!-- só aparece na edição: tire o "hidden" pelo JS -->
+        <p class="dica" id="dica-senha" hidden>Deixe em branco para manter a senha atual.</p>
+      </div>
+
+      <p class="erro-form" id="erro-form" role="alert" hidden></p>
+
+      <div class="botoes">
+        <button type="button" class="btn btn-fantasma" id="cancelar">Cancelar</button>
+        <button type="submit" class="btn btn-azul" id="salvar">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ============ Confirmar exclusão ============ -->
+  <dialog id="dlg-excluir" aria-labelledby="exc-titulo">
+    <h2 id="exc-titulo">Excluir cliente</h2>
+    <p class="texto" id="exc-texto">O cliente será removido da lista. Essa ação não pode ser desfeita.</p>
+    <p class="erro-form" id="exc-erro" role="alert" hidden></p>
+    <div class="botoes">
+      <button type="button" class="btn btn-fantasma" id="exc-cancelar">Cancelar</button>
+      <button type="button" class="btn btn-perigo" id="exc-confirmar">Excluir</button>
+    </div>
+  </dialog>
+
+  <!-- Aviso rápido -->
+  <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+  <!--
+    MODELO DE LINHA: clone com modelo.content.cloneNode(true) e preencha:
+    .chip-id  .col-nome  .col-device  .col-data (criado)  .col-data (acesso)
+    botões: .btn-conectar  .btn-icone (editar)  .btn-icone.excluir
+    Em telas pequenas os rótulos vêm dos atributos data-label dos <td>.
+  -->
+  <template id="modelo-linha">
+    <tr>
+      <td class="col-id" data-label="ID"><span class="chip-id"></span></td>
+      <td class="col-nome"></td>
+      <td class="col-device" data-label="Dispositivo"></td>
+      <td class="col-data col-criado" data-label="Criado em"></td>
+      <td class="col-data col-acesso" data-label="Último acesso"></td>
+      <td class="col-acoes">
+        <div class="acoes">
+          <button type="button" class="btn-conectar">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v11H3z"/><path d="M8 20h8M12 16v4"/></svg><span>Conectar</span>
+          </button>
+          <button type="button" class="btn-icone btn-editar" title="Editar">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>
+          </button>
+          <button type="button" class="btn-icone excluir btn-excluir" title="Excluir">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  </template>
+
+  <script src="../static/js/panel.js" defer></script>
 </body>
 </html>
