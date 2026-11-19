@@ -1,6 +1,18 @@
 const form = document.getElementById("loginForm")
 const button = document.getElementById("button")
 const errorBox = document.getElementById("error")
+const buttonShowPassword = document.getElementsByClassName("mostrar")[0]
+const inputPassword = document.getElementById("password")
+
+buttonShowPassword.addEventListener("click", async () => {  
+     if (inputPassword.getAttribute("type") == "password") {
+        inputPassword.setAttribute("type", "text")
+        buttonShowPassword.textContent = "Esconder"
+     } else {
+        inputPassword.setAttribute("type", "password")
+        buttonShowPassword.textContent = "Mostrar"
+     }
+})
 
 function showErrorBox(message) {
     errorBox.textContent = message
@@ -32,10 +44,10 @@ form.addEventListener("submit", async event => {
         }
 
         if (error == "401") {
-            showErrorBox("Usuário ou senha inválidos")    
+            showErrorBox("Usuário ou senha incorretos.Verifique os dados e tente novamente")    
         }
         else {
-            showErrorBox("Usuário ou senha inválidos")
+            showErrorBox("Usuário ou senha incorretos.Verifique os dados e tente novamente")
         }
 
     }
