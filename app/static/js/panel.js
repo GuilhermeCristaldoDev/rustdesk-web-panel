@@ -9,6 +9,7 @@ const erroForm = document.getElementById('erro-form')
 const inputId = document.getElementById('f-id')
 const buttonSave = document.getElementById('salvar')
 const clientsCount = document.getElementById('contagem')
+const dlgExclude = document.getElementById('dlg-excluir')
 
 
 async function getClients(){
@@ -16,6 +17,8 @@ async function getClients(){
     const clients = await response.json()
 
     table.textContent = ""
+
+    clientsCount.textContent = `${clients.length} clientes`
 
     if (clients.length == 0) {
         noClientsText.hidden = false
@@ -36,18 +39,49 @@ async function getClients(){
         clone.querySelector('.col-acesso').textContent = client.last_session? new Date(client.last_session).toLocaleDateString("pt-BR") : "-"
         table.appendChild(clone)
     });
-
-    clientsCount.textContent = `${clients.length} clientes`
     
 }
 
+table.addEventListener("click", async event => {
+    const button = event.target.closest('.btn-excluir')
 
+    if (!button) return
+
+    dlgExclude.showModal()
+
+    dlgExclude.addEventListener("click", async event => {
+        const buttonDlg = event.target.closest('button')
+
+        if (!buttonDlg) return 
+
+        if (buttonDlg.textContent == "Excluir") {
+            const line = button.closest('tr')
+            const id  = line.dataset.id
+
+            const response = await fetch(`/clients/${id}`, {
+                method: "DELETE"
+            })
+
+            if (response.status == 404) {
+                const erro = await response.json().detail
+
+                console.log(erro)
+            }
+
+            if (response.ok) {
+                await getClients()
+            }
+        }
+
+        dlgExclude.close()
+    })
+})
 
 newClientButton.addEventListener("click", () => {
     dlgClient.showModal()
 })
 
-cancelButton.addEventListener("click", event => {
+cancelButton.addEventListener("click", () => {
     dlgClient.close()
 })
 
