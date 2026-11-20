@@ -8,6 +8,7 @@ const cancelButton = document.getElementById('cancelar')
 const erroForm = document.getElementById('erro-form')
 const inputId = document.getElementById('f-id')
 const buttonSave = document.getElementById('salvar')
+const clientsCount = document.getElementById('contagem')
 
 
 async function getClients(){
@@ -35,6 +36,8 @@ async function getClients(){
         clone.querySelector('.col-acesso').textContent = client.last_session? new Date(client.last_session).toLocaleDateString("pt-BR") : "-"
         table.appendChild(clone)
     });
+
+    clientsCount.textContent = `${clients.length} clientes`
     
 }
 
