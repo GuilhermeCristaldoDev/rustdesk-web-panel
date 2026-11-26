@@ -18,13 +18,14 @@ const buttonLogout = document.getElementById('sair')
 async function getClients(){
     try {
     const response = await api("/clients", "GET")
-    const clients = await response.json()
+   
     
     if (!response.ok) { 
         table.textContent = "Erro ao buscar clientes"
         return
     }
 
+    const clients = await response.json()
     table.textContent = ""
 
     clientsCount.textContent = `${clients.length} clientes`
@@ -51,8 +52,6 @@ async function getClients(){
     } catch(error) {
         console.log(error)
     }
-    
-    
 }
 
 table.addEventListener("click", async event => {
@@ -60,34 +59,41 @@ table.addEventListener("click", async event => {
 
     if (!button) return
 
+    const line = button.closest('tr')
+    dlgClient.dataset.id = line.dataset.id
+
     dlgExclude.showModal()
+})
 
-    dlgExclude.addEventListener("click", async event => {
-        const buttonDlg = event.target.closest('button')
+dlgExclude.addEventListener("click", async event => {
+    const buttonDlg = event.target.closest('button')
 
-        if (!buttonDlg) return 
+    if (!buttonDlg) return 
 
-        if (buttonDlg.textContent == "Excluir") {
-            const line = button.closest('tr')
-            const id  = line.dataset.id
+    if (buttonDlg.textContent.trim() === "Excluir") {
+        const id = dlgClient.dataset.id
 
-            const response = await fetch(`/clients/${id}`, {
-                method: "DELETE"
-            })
-
-            if (response.status == 404) {
-                const erro = await response.json().detail
-
-                console.log(erro)
-            }
+        try{
+            const response = await api(`/clients/${id}`, "DELETE")
 
             if (response.ok) {
                 await getClients()
             }
-        }
 
+            if (response.status == 404) {
+                const data = await response.json()
+
+                console.log(data.detail)
+            }
+
+        } catch(error) {
+            console.log(error)
+        }
+        delete dlgExclude.dataset.id
         dlgExclude.close()
-    })
+    }
+
+    
 })
 
 newClientButton.addEventListener("click", () => {
@@ -95,9 +101,8 @@ newClientButton.addEventListener("click", () => {
 })
 
 cancelButton.addEventListener("click", () => {
-    buttonSave.disable = false
+    buttonSave.disabled = false
     dlgClient.close()
-   
 })
 
 dlgClient.addEventListener("close", () => {
