@@ -10,6 +10,7 @@ const inputId = document.getElementById('f-id')
 const buttonSave = document.getElementById('salvar')
 const clientsCount = document.getElementById('contagem')
 const dlgExclude = document.getElementById('dlg-excluir')
+const buttonLogout = document.getElementById('sair')
 
 
 async function getClients(){
@@ -82,7 +83,9 @@ newClientButton.addEventListener("click", () => {
 })
 
 cancelButton.addEventListener("click", () => {
+    buttonSave.disable = false
     dlgClient.close()
+   
 })
 
 dlgClient.addEventListener("close", () => {
@@ -124,6 +127,19 @@ form.addEventListener("submit", async (event) => {
     buttonSave.disabled = false
 
         
+})
+
+buttonLogout.addEventListener("click", async () => {
+    const response = await fetch("/auth/logout", {
+        method: "POST",
+        headers: {
+            'Content-type': 'application/json'      
+        }
+    })
+
+    if (response.ok) {
+        window.location.href = "/"
+    }
 })
 
 getClients()
