@@ -1,3 +1,5 @@
+import { api } from './api.js'
+
 const table = document.getElementById('linhas')
 const modelo = document.getElementById('modelo-linha')
 const noClientsText = document.getElementById('estado')
@@ -14,8 +16,14 @@ const buttonLogout = document.getElementById('sair')
 
 
 async function getClients(){
-    const response = await fetch("/clients/")
+    try {
+    const response = await api("/clients", "GET")
     const clients = await response.json()
+    
+    if (!response.ok) { 
+        table.textContent = "Erro ao buscar clientes"
+        return
+    }
 
     table.textContent = ""
 
@@ -40,6 +48,10 @@ async function getClients(){
         clone.querySelector('.col-acesso').textContent = client.last_session? new Date(client.last_session).toLocaleDateString("pt-BR") : "-"
         table.appendChild(clone)
     });
+    } catch(error) {
+        console.log(error)
+    }
+    
     
 }
 
