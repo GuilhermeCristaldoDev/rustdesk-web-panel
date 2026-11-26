@@ -116,21 +116,14 @@ form.addEventListener("submit", async (event) => {
 
     const dados = Object.fromEntries(new FormData(form))
 
-    const response = await fetch("/clients/", {
-        method: "POST",
-        headers: {
-            'Content-type': 'application/json',
-        },
-        body: JSON.stringify(dados)
-    })
-
+    const response = await api("/clients/", "POST", true, JSON.stringify(dados))
+    
     if (response.status === 422) {
-        const erro = await response.json().detail
-        console.error(erro)
+        showErrorForm(response)
     }
 
     if (response.status === 409) {
-        const data = await response.json()
+        
 
         erroForm.textContent = data.detail
         erroForm.hidden = false
@@ -158,6 +151,13 @@ buttonLogout.addEventListener("click", async () => {
         window.location.href = "/"
     }
 })
+
+function showErrorForm(res) {
+    const data = await response.json()
+
+    erroForm.textContent = text
+    erroForm.hidden = false
+}
 
 getClients()
 
