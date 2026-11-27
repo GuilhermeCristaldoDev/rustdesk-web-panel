@@ -55,14 +55,44 @@ async function getClients(){
 }
 
 table.addEventListener("click", async event => {
-    const button = event.target.closest('.btn-excluir')
-
+    const button = event.target.closest("button")
+    
     if (!button) return
 
+    const typeButton = button.dataset.name
     const line = button.closest('tr')
-    dlgClient.dataset.id = line.dataset.id
+    const id = line.dataset.id
 
-    dlgExclude.showModal()
+    if (typeButton == "exclude"){    
+        dlgClient.dataset.id = id
+
+        dlgExclude.showModal()
+    } else if (typeButton == "connect") {
+        try {
+            const response = await api(`clients/credentials/${id}`, "GET")
+
+            if (response.status == 404) {
+                console.log("Cliente não encontrado")
+            }
+
+            if (response.ok) {
+                const data = await response.json()
+
+                await navigator.clipboard.writeText(data.passwd)
+                window.location.href = `rustdesk://${id}`
+            }
+
+            setTimeout(() => {
+               await navigator.clipboard.writeText("") 
+            }, 15000);
+            
+        }catch(error) {
+            console.log(error)
+        }
+
+    } else {
+
+    }
 })
 
 dlgExclude.addEventListener("click", async event => {
@@ -76,14 +106,14 @@ dlgExclude.addEventListener("click", async event => {
         try{
             const response = await api(`/clients/${id}`, "DELETE")
 
-            if (response.ok) {
-                await getClients()
-            }
-
             if (response.status == 404) {
                 const data = await response.json()
 
                 console.log(data.detail)
+            }
+
+            if (response.ok) {
+                await getClients()
             }
 
         } catch(error) {
