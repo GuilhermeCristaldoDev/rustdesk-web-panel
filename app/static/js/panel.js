@@ -82,18 +82,32 @@ table.addEventListener("click", async event => {
                 window.location.href = `rustdesk://${id}`
             }
 
-            setTimeout(() => {
-               await navigator.clipboard.writeText("") 
+            setTimeout(async () => {
+                try {
+                    await navigator.clipboard.writeText("")
+                } catch(error) {
+                    console.warn(error)
+                }
             }, 15000);
-            
+
         }catch(error) {
             console.log(error)
         }
 
-    } else {
-
+    } else if (typeButton == "edit"){
+        mountEditForm(line)
     }
 })
+
+function mountEditForm(client) {
+    dlgClient.querySelector("#dlg-titulo").textContent = "Editar Cliente"
+    dlgClient.querySelector("#f-id").value = client.dataset.id
+    dlgClient.querySelector("#f-nome").value = client.querySelector(".col-nome").textContent
+    dlgClient.querySelector("#f-device").value = client.querySelector(".col-device").textContent
+    dlgClient.querySelector("#dica-senha").hidden = false
+
+    dlgClient.showModal()
+}
 
 dlgExclude.addEventListener("click", async event => {
     const buttonDlg = event.target.closest('button')
