@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 
 from ..database import SessionDep
-from ..models import Client, ClientCreate, ClientUpdate, ClientPublic
+from ..models import Client, ClientCreate, ClientUpdate, ClientPublic, ClientCredentials
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -21,6 +21,13 @@ def read_client(client_id: str, session: SessionDep):
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
+    return client
+
+@router.get("/credentials/{client_id}", response_model=ClientCredentials)
+def read_credentials(client_id: str, session: SessionDep):
+    client = session.get(Client, client_id)
+    if not client: 
+        raise HTTPException(status_code=404, detail="Cliente não encontado")
     return client
 
 @router.post("/", response_model=ClientPublic)
