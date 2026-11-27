@@ -46,7 +46,7 @@ button { cursor: pointer; }
 /* ---------- Topo ---------- */
 .topo { background: var(--marinho); color: #fff; }
 .topo-in {
-  max-width: 1080px; margin: 0 auto; padding: 12px 20px;
+  max-width: 1080px; margin: 0 auto; padding: 8px 0px; 
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .marca {
