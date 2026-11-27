@@ -49,11 +49,47 @@ button { cursor: pointer; }
   max-width: 1080px; margin: 0 auto; padding: 12px 20px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.marca { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.logo { flex: none; width: 96px; height: 50px; padding: 4px; background: var(--branco); border-radius: 10px; }
-.logo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 8%; }
-.marca-nome { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.2; }
-.marca-sub { margin: 2px 0 0; font-size: .85rem; line-height: 1.2; color: #a9b8d3; }
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.logo {
+  flex: none;
+  width: 7em;
+  height: 7em;
+  padding: 0;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+
+.marca-nome {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.marca-sub {
+  margin: 2px 0 0;
+  font-size: .85rem;
+  line-height: 1.2;
+  color: #a9b8d3;
+}
+
 
 .btn-sair {
   display: inline-flex; align-items: center; gap: 8px;
