@@ -134,16 +134,16 @@ form.addEventListener("submit", async (event) => {
 })
 
 buttonLogout.addEventListener("click", async () => {
-    const response = await fetch("/auth/logout", {
-        method: "POST",
-        headers: {
-            'Content-type': 'application/json'      
-        }
-    })
+    try{ 
+        const response = await api("/auth/logout", "POST", true)
 
-    if (response.ok) {
-        window.location.href = "/"
+        if (response.ok) {
+            window.location.href = "/"
+        }
+    }catch(error){ 
+        console.log(error)
     }
+
 })
 
 async function showErrorForm(res, inputToFocus) {
@@ -152,7 +152,7 @@ async function showErrorForm(res, inputToFocus) {
     erroForm.textContent = data.detail
     erroForm.hidden = false
     if (inputToFocus)
-        inputToFocus.focus
+        inputToFocus.focus()
 }
 
 getClients()
