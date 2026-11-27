@@ -89,10 +89,10 @@ dlgExclude.addEventListener("click", async event => {
         } catch(error) {
             console.log(error)
         }
-        delete dlgExclude.dataset.id
-        dlgExclude.close()
-    }
-
+        
+    } 
+    delete dlgExclude.dataset.id
+    dlgExclude.close()
     
 })
 
@@ -123,20 +123,14 @@ form.addEventListener("submit", async (event) => {
     }
 
     if (response.status === 409) {
-        
-
-        erroForm.textContent = data.detail
-        erroForm.hidden = false
-        inputId.focus()
+        showErrorForm(response, inputId)
     }
 
     if(response.ok)
         dlgClient.close()
         getClients()
 
-    buttonSave.disabled = false
-
-        
+    buttonSave.disabled = false   
 })
 
 buttonLogout.addEventListener("click", async () => {
@@ -152,11 +146,13 @@ buttonLogout.addEventListener("click", async () => {
     }
 })
 
-function showErrorForm(res) {
-    const data = await response.json()
+async function showErrorForm(res, inputToFocus) {
+    const data = await res.json()
 
-    erroForm.textContent = text
+    erroForm.textContent = data.detail
     erroForm.hidden = false
+    if (inputToFocus)
+        inputToFocus.focus
 }
 
 getClients()
